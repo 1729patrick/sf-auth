@@ -1,0 +1,50 @@
+security:
+    # https://symfony.com/doc/current/security.html#where-do-users-come-from-user-providers
+    providers:
+      main:
+          entity:
+              class: App\Entity\User
+
+
+    firewalls:
+        dev:
+            pattern: ^/(_(profiler|wdt)|css|images|js)/
+            security: false
+        main:
+            anonymous: true
+
+            # activate different ways to authenticate
+
+            # http_basic: true
+            # https://symfony.com/doc/current/security.html#a-configuring-how-your-users-will-authenticate
+
+            form_login:
+                login_path: login
+                check_path: login
+                default_target_path: dashboard #rota padrao após logar
+                always_use_default_target_path: true #rota padrao após logar
+            # https://symfony.com/doc/current/security/form_login_setup.html
+
+            logout:
+                path: /logout #caminho para deslogar
+                target: /admin/login #caminho de redirecionamento após deslogar
+
+
+    # Easy way to control access for large sections of your site
+    # Note: Only the *first* access control that matches will be used
+    access_control:
+         - { path: ^/admin/login, roles: IS_AUTHENTICATED_ANONYMOUSLY } #para redirecionar para admin/login ao acessar /admin
+         - { path: ^/admin/dashboard, roles: ROLE_USER } #usuário tem acesso ao dashboard
+         - { path: ^/admin/relatorios, roles: ROLE_ADMIN } #apenas admin tem acesso aos relatórios
+         - { path: ^/admin, roles: ROLE_USER } #usuario tem acesso a área de admin
+
+
+    role_hierarchy:
+        ROLE_ADMIN: ROLE_USER #admin tem todas as pemissoes que o usuario possui
+
+
+    #códificar senha
+    encoders:
+        App\Entity\User:
+            algorithm: bcrypt
+            cost: 12
